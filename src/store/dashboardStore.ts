@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Process, IPCMessage, EventLog, CapturedImage, SystemStats } from "@/types/dashboard";
+import { Process, IPCMessage, EventLog, CapturedImage, SystemStats, Alert, MicrokernelStats, CPUHistory } from "@/types/dashboard";
 
 interface DashboardState {
   processes: Process[];
@@ -7,22 +7,39 @@ interface DashboardState {
   eventLogs: EventLog[];
   capturedImages: CapturedImage[];
   stats: SystemStats;
+  alerts: Alert[];
+  microkernelStats: MicrokernelStats;
+  cpuHistory: CPUHistory[];
+  isBootSequenceRunning: boolean;
+  isDemoMode: boolean;
   
   updateProcess: (id: string, updates: Partial<Process>) => void;
   addIPCMessage: (message: Omit<IPCMessage, "id">) => void;
   addEventLog: (log: Omit<EventLog, "id">) => void;
   addCapturedImage: (image: Omit<CapturedImage, "id">) => void;
+  updateCapturedImage: (id: string, updates: Partial<CapturedImage>) => void;
   simulateFailure: (processId: string) => void;
   updateStats: (updates: Partial<SystemStats>) => void;
+  addAlert: (alert: Omit<Alert, "id">) => void;
+  clearAlert: (id: string) => void;
+  updateMicrokernelStats: (updates: Partial<MicrokernelStats>) => void;
+  addCPUHistory: (data: CPUHistory) => void;
+  setBootSequenceRunning: (running: boolean) => void;
+  setDemoMode: (active: boolean) => void;
+  exportSystemData: () => string;
 }
 
 const initialProcesses: Process[] = [
-  { id: "1", name: "Controle de Voo", priority: "P1", state: "Running", cpu: 45 },
-  { id: "2", name: "Navegação IA", priority: "P2", state: "Running", cpu: 67 },
-  { id: "3", name: "Driver Câmera", priority: "P3", state: "Running", cpu: 23 },
-  { id: "4", name: "Driver NPU", priority: "P3", state: "Waiting", cpu: 15 },
-  { id: "5", name: "Gerência Arquivos", priority: "P3", state: "Running", cpu: 12 },
-  { id: "6", name: "Analisar Composição", priority: "P4", state: "Waiting", cpu: 8 },
+  { id: "1", name: "Controle de Voo", priority: "P1", state: "Running", cpu: 45, layer: 1 },
+  { id: "2", name: "Navegação IA", priority: "P2", state: "Running", cpu: 67, layer: 3 },
+  { id: "3", name: "Driver Câmera", priority: "P3", state: "Running", cpu: 23, layer: 2 },
+  { id: "4", name: "Driver NPU", priority: "P3", state: "Waiting", cpu: 15, layer: 2 },
+  { id: "5", name: "Gerência Arquivos", priority: "P3", state: "Running", cpu: 12, layer: 2 },
+  { id: "6", name: "Analisar Composição", priority: "P4", state: "Waiting", cpu: 8, layer: 4 },
+  { id: "7", name: "Gerência Memória", priority: "P3", state: "Running", cpu: 18, layer: 2 },
+  { id: "8", name: "Gerência Dispositivos", priority: "P3", state: "Running", cpu: 14, layer: 2 },
+  { id: "9", name: "Comunicação DSN", priority: "P3", state: "Running", cpu: 22, layer: 3 },
+  { id: "10", name: "Gerência Energia", priority: "P3", state: "Running", cpu: 9, layer: 3 },
 ];
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -38,11 +55,21 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   ],
   capturedImages: [],
   stats: {
-    totalProcesses: 6,
+    totalProcesses: 10,
     ipcPerSecond: 0,
     uptime: 0,
     cpuUsage: 35,
   },
+  alerts: [],
+  microkernelStats: {
+    schedulerQueueSize: 3,
+    ipcHubMessages: 0,
+    mmuMemorySpaces: 10,
+    lastIRQ: "Timer",
+  },
+  cpuHistory: [],
+  isBootSequenceRunning: false,
+  isDemoMode: false,
 
   updateProcess: (id, updates) =>
     set((state) => ({
@@ -110,4 +137,54 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     set((state) => ({
       stats: { ...state.stats, ...updates },
     })),
+
+  addAlert: (alert) =>
+    set((state) => {
+      const newAlert = { ...alert, id: Date.now().toString() };
+      return {
+        alerts: [newAlert, ...state.alerts].slice(0, 10),
+      };
+    }),
+
+  clearAlert: (id) =>
+    set((state) => ({
+      alerts: state.alerts.filter((a) => a.id !== id),
+    })),
+
+  updateMicrokernelStats: (updates) =>
+    set((state) => ({
+      microkernelStats: { ...state.microkernelStats, ...updates },
+    })),
+
+  addCPUHistory: (data) =>
+    set((state) => ({
+      cpuHistory: [...state.cpuHistory, data].slice(-30),
+    })),
+
+  setBootSequenceRunning: (running) =>
+    set({ isBootSequenceRunning: running }),
+
+  setDemoMode: (active) =>
+    set({ isDemoMode: active }),
+
+  updateCapturedImage: (id, updates) =>
+    set((state) => ({
+      capturedImages: state.capturedImages.map((img) =>
+        img.id === id ? { ...img, ...updates } : img
+      ),
+    })),
+
+  exportSystemData: () => {
+    const state = get();
+    return JSON.stringify({
+      processes: state.processes,
+      stats: state.stats,
+      alerts: state.alerts,
+      microkernelStats: state.microkernelStats,
+      eventLogs: state.eventLogs.slice(0, 20),
+      ipcMessages: state.ipcMessages.slice(0, 20),
+      capturedImages: state.capturedImages,
+      timestamp: new Date().toISOString(),
+    }, null, 2);
+  },
 }));

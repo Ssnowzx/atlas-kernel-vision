@@ -8,6 +8,7 @@ export interface Process {
   priority: ProcessPriority;
   state: ProcessState;
   cpu: number;
+  layer: number;
 }
 
 export interface IPCMessage {
@@ -43,4 +44,23 @@ export interface SystemStats {
   ipcPerSecond: number;
   uptime: number;
   cpuUsage: number;
+}
+
+export interface Alert {
+  id: string;
+  severity: "critical" | "warning" | "info";
+  message: string;
+  timestamp: string;
+}
+
+export interface MicrokernelStats {
+  schedulerQueueSize: number;
+  ipcHubMessages: number;
+  mmuMemorySpaces: number;
+  lastIRQ: string;
+}
+
+export interface CPUHistory {
+  timestamp: number;
+  cpu: number;
 }

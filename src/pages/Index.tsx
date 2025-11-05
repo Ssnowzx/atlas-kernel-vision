@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { Header } from "@/components/Dashboard/Header";
 import { StatsCard } from "@/components/Dashboard/StatsCard";
@@ -6,11 +6,31 @@ import { ProcessTable } from "@/components/Dashboard/ProcessTable";
 import { IPCMonitor } from "@/components/Dashboard/IPCMonitor";
 import { EventLog } from "@/components/Dashboard/EventLog";
 import { ImageGallery } from "@/components/Dashboard/ImageGallery";
+import { MicrokernelSection } from "@/components/Dashboard/MicrokernelSection";
+import { ArchitectureDiagram } from "@/components/Dashboard/ArchitectureDiagram";
+import { BootSequence } from "@/components/Dashboard/BootSequence";
+import { SystemCharts } from "@/components/Dashboard/SystemCharts";
+import { AlertsPanel } from "@/components/Dashboard/AlertsPanel";
+import { DemoMode } from "@/components/Dashboard/DemoMode";
+import { ExportData } from "@/components/Dashboard/ExportData";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDashboardStore } from "@/store/dashboardStore";
 import { Cpu, MessageSquare, Clock, Activity } from "lucide-react";
 
 const Index = () => {
-  const { processes, stats, updateStats, addIPCMessage, addEventLog, updateProcess } = useDashboardStore();
+  const { 
+    processes, 
+    stats, 
+    updateStats, 
+    addIPCMessage, 
+    addEventLog, 
+    updateProcess,
+    updateMicrokernelStats,
+    addCPUHistory,
+    addAlert,
+    alerts
+  } = useDashboardStore();
+  const [failureCount, setFailureCount] = useState<Record<string, number>>({});
 
   useEffect(() => {
     // Simulate real-time updates
@@ -20,14 +40,30 @@ const Index = () => {
 
       // Randomly update process states and CPU
       const randomProcess = processes[Math.floor(Math.random() * processes.length)];
-      if (randomProcess && randomProcess.state !== "Crashed") {
-        const newCpu = Math.max(5, Math.min(90, randomProcess.cpu + Math.floor(Math.random() * 20 - 10)));
-        updateProcess(randomProcess.id, { cpu: newCpu });
+      if (randomProcess) {
+        if (randomProcess.state !== "Crashed") {
+          const newCpu = Math.max(5, Math.min(90, randomProcess.cpu + Math.floor(Math.random() * 20 - 10)));
+          updateProcess(randomProcess.id, { cpu: newCpu });
 
-        // Randomly change state between Running and Waiting
-        if (Math.random() > 0.9) {
-          const newState = randomProcess.state === "Running" ? "Waiting" : "Running";
-          updateProcess(randomProcess.id, { state: newState });
+          // Randomly change state between Running and Waiting
+          if (Math.random() > 0.9) {
+            const newState = randomProcess.state === "Running" ? "Waiting" : "Running";
+            updateProcess(randomProcess.id, { state: newState });
+          }
+        }
+
+        // Track failures for alerts
+        if (randomProcess.state === "Crashed") {
+          const count = (failureCount[randomProcess.id] || 0) + 1;
+          setFailureCount({ ...failureCount, [randomProcess.id]: count });
+          
+          if (count >= 3) {
+            addAlert({
+              severity: "critical",
+              message: `Processo ${randomProcess.name} falhou 3x - CRÍTICO`,
+              timestamp: new Date().toLocaleTimeString("pt-BR"),
+            });
+          }
         }
       }
 
@@ -37,8 +73,24 @@ const Index = () => {
       );
       updateStats({ cpuUsage: avgCpu });
 
+      // Add CPU history
+      addCPUHistory({
+        timestamp: Date.now(),
+        cpu: avgCpu,
+      });
+
+      // CPU usage alerts
+      if (avgCpu > 90) {
+        addAlert({
+          severity: "warning",
+          message: "CPU >90% por 5s - HIGH LOAD",
+          timestamp: new Date().toLocaleTimeString("pt-BR"),
+        });
+      }
+
       // Generate IPC messages
-      if (Math.random() > 0.4) {
+      const ipcCount = Math.floor(Math.random() * 3);
+      for (let i = 0; i < ipcCount; i++) {
         const processNames = processes.map((p) => p.name);
         const from = processNames[Math.floor(Math.random() * processNames.length)];
         let to = processNames[Math.floor(Math.random() * processNames.length)];
@@ -55,9 +107,27 @@ const Index = () => {
           to,
           type,
         });
-
-        updateStats({ ipcPerSecond: stats.ipcPerSecond + 1 });
       }
+
+      const totalIPC = ipcCount;
+      updateStats({ ipcPerSecond: totalIPC });
+
+      // IPC queue alert
+      if (totalIPC > 100) {
+        addAlert({
+          severity: "warning",
+          message: "IPC queue >100 - WARNING",
+          timestamp: new Date().toLocaleTimeString("pt-BR"),
+        });
+      }
+
+      // Update microkernel stats
+      updateMicrokernelStats({
+        schedulerQueueSize: Math.floor(Math.random() * 10) + 1,
+        ipcHubMessages: totalIPC,
+        mmuMemorySpaces: processes.length,
+        lastIRQ: ["Timer", "Keyboard", "Network", "Disk"][Math.floor(Math.random() * 4)],
+      });
 
       // Random system events
       if (Math.random() > 0.95) {
@@ -76,7 +146,7 @@ const Index = () => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [processes, stats]);
+  }, [processes, stats, failureCount]);
 
   const formatUptime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -91,6 +161,12 @@ const Index = () => {
       <Header />
 
       <main className="container mx-auto px-6 py-8 space-y-8">
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3">
+          <DemoMode />
+          <ExportData />
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
@@ -122,18 +198,45 @@ const Index = () => {
           />
         </div>
 
-        {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <ProcessTable />
-            <IPCMonitor />
-            <ImageGallery />
-          </div>
+        {/* Tabs Section */}
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="bg-card/50 border border-primary/20">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="architecture">Arquitetura</TabsTrigger>
+            <TabsTrigger value="boot">Boot</TabsTrigger>
+            <TabsTrigger value="charts">Gráficos</TabsTrigger>
+          </TabsList>
 
-          <div className="lg:col-span-1">
-            <EventLog />
-          </div>
-        </div>
+          <TabsContent value="dashboard" className="space-y-8">
+            <MicrokernelSection />
+            
+            {alerts.length > 0 && <AlertsPanel />}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <ProcessTable />
+                <IPCMonitor />
+                <ImageGallery />
+              </div>
+
+              <div className="lg:col-span-1">
+                <EventLog />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="architecture">
+            <ArchitectureDiagram />
+          </TabsContent>
+
+          <TabsContent value="boot">
+            <BootSequence />
+          </TabsContent>
+
+          <TabsContent value="charts">
+            <SystemCharts />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
