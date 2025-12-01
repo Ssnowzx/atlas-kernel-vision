@@ -1,6 +1,6 @@
-# Atlas Kernel Vision
+# AtlasOS - Microkernel para Exploração do Cometa 3I/ATLAS
 
-Dashboard interativo para visualização em tempo real da arquitetura **microkernel AtlasOS** — missão de exploração do cometa interestelar **3I/ATLAS**.
+**Projeto acadêmico completo**: Sistema operacional microkernel para sonda espacial autônoma + Dashboard de visualização em tempo real.
 
 ---
 
@@ -10,23 +10,37 @@ Exploração científica do **3I/ATLAS**, terceiro objeto interestelar confirmad
 
 ---
 
+## 🖼️ Diagrama da Arquitetura
+
+![Framework AtlasOS - Arquitetura Microkernel](backend/Slides/FrameWork.png)
+
+> **Diagrama completo**: Visualização das 5 camadas do microkernel, fluxo IPC hub-and-spoke, drivers isolados e Recovery Agent.
+
+📄 **Apresentação completa**: [AtlasOS - O Coração da Mineração Espacial (PDF)](backend/Slides/AtlasOS_O_Coração_da_Mineração_Espacial.pdf)
+
+---
+
 ## 🚀 Quick Start
 
 ### Pré-requisitos
 
 - **Node.js 18+** (recomendado: 20+)
 - **Yarn** (package manager)
+- **Python 3.10+** (simulador microkernel)
 
 ### 1. Instalar dependências
 
 ```bash
 # Frontend
-cd /Users/snows/atlas-kernel-vision
 yarn install
 
-# Backend
-cd /Users/snows/atlas-kernel-vision/server
+# Backend Node.js (API + WebSocket)
+cd server
 yarn install
+
+# Backend Python (opcional - simulador)
+cd backend
+python3 -m pip install -r requirements.txt  # se houver
 ```
 
 ### 2. Executar o sistema completo
