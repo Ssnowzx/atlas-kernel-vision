@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../atlas-kernel-vision"
+		}
+	],
+	"settings": {}
+}
