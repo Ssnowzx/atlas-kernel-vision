@@ -56,28 +56,33 @@ function sendIPCMessage(source, destination, type) {
 }
 
 function captureImage() {
-  const imageId = `3I_ATLAS_${String(systemState.cometImages.length + 1).padStart(3, "0")}`;
-  const descriptions = [
-    "Núcleo ativo - H₂O, CH₄ detectado",
-    "Coma expansiva - jatos ativos",
-    "Polo sul - moléculas orgânicas",
-    "Superfície irregular - criovolcão",
-    "Espectro infravermelho - NH₃",
-    "Jato de gás - velocidade 800 m/s",
+  // As 5 imagens reais do cometa 3I/ATLAS
+  const cometImages = [
+    { src: "/imagens/Núcleo ativo.png", label: "Núcleo Ativo", description: "Região central do cometa com atividade intensa - H₂O, CH₄ detectado" },
+    { src: "/imagens/Coma expansiva.png", label: "Coma Expansiva", description: "Nuvem de gás e poeira ao redor do núcleo - jatos ativos" },
+    { src: "/imagens/Jato de gás.png", label: "Jato de Gás", description: "Emissão de jatos de gás sublimado - velocidade 800 m/s" },
+    { src: "/imagens/Espectro infravermelho .png", label: "Espectro Infravermelho", description: "Análise térmica do cometa - NH₃ detectado" },
+    { src: "/imagens/Núcleo e coma interstelar.png", label: "Núcleo e Coma Interstelar", description: "Visão completa do objeto interestelar - moléculas orgânicas" },
   ];
+
+  const imageIndex = systemState.cometImages.length % cometImages.length;
+  const cometImage = cometImages[imageIndex];
+  const imageId = `3I_ATLAS_${String(systemState.cometImages.length + 1).padStart(3, "0")}`;
 
   const image = {
     id: imageId,
-    filename: `${imageId}.jpg`,
+    filename: `${imageId}.png`,
     timestamp: new Date().toISOString().slice(11, 19),
-    description: descriptions[Math.floor(Math.random() * descriptions.length)],
+    description: cometImage.description,
+    label: cometImage.label,
+    url: cometImage.src,
   };
 
   systemState.cometImages.push(image);
   if (systemState.cometImages.length > 10) systemState.cometImages.shift();
 
   sendIPCMessage("hardware_camera", "driver_camera", "IRQ_IMAGE_CAPTURED");
-  logEvent(`Imagem capturada: ${image.filename}`, "info");
+  logEvent(`Imagem capturada: ${cometImage.label}`, "info");
 }
 
 function simulateProcessActivity() {
@@ -114,7 +119,7 @@ setInterval(() => {
 
 setInterval(() => {
   captureImage();
-}, 15000); // Captura imagem a cada 15 segundos
+}, 60000); // Captura imagem a cada 1 minuto (60 segundos)
 
 setInterval(() => {
   checkProcessHealth();
@@ -141,12 +146,24 @@ wss.on('connection', (ws) => {
   // Enviar estado inicial
   ws.send(JSON.stringify({ type: "STATE_UPDATE", data: systemState }));
 
-  // Atualizar frontend a cada 1 segundo
+  // Log envio inicial
+  console.log('[WS SEND] initial STATE_UPDATE');
+
+  // Atualizar frontend a cada 1 segundo e logar o payload (para debugging)
   const interval = setInterval(() => {
-    ws.send(JSON.stringify({ type: "STATE_UPDATE", data: systemState }));
+    try {
+      const payload = JSON.stringify({ type: "STATE_UPDATE", data: systemState });
+      ws.send(payload);
+      // Log truncado para evitar prints enormes, mas suficiente para debugging
+      console.log('[WS SEND]', payload.slice(0, 1000));
+    } catch (err) {
+      console.error('[WS SEND ERROR]', err && err.stack ? err.stack : err);
+    }
   }, 1000);
 
   ws.on('message', (data) => {
+    // Log raw message received from frontend for full visibility
+    console.log('[WS RECV]', data.toString().slice(0, 2000));
     try {
       const message = JSON.parse(data.toString());
       handleClientMessage(message);
@@ -191,6 +208,11 @@ app.get('/api/status', (req, res) => {
     processes: systemState.processes.length,
     totalCpu: systemState.totalCpu,
   });
+});
+
+// Expose full current state for external tools (useful for CLI monitors)
+app.get('/api/state', (req, res) => {
+  res.json(systemState);
 });
 
 server.listen(PORT, () => {

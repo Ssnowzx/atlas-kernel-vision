@@ -38,6 +38,8 @@ interface CometImage {
   filename: string;
   timestamp: string;
   description: string;
+  label?: string;
+  url?: string;
 }
 
 interface SystemState {
@@ -347,8 +349,20 @@ const Index = () => {
                 key={img.id}
                 className="bg-gray-800/50 border border-gray-700 rounded-lg overflow-hidden hover:border-blue-600 transition-colors"
               >
-                <div className="aspect-video bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 flex items-center justify-center relative">
-                  <Camera className="h-16 w-16 text-gray-600" />
+                <div className="aspect-video bg-black flex items-center justify-center relative overflow-hidden">
+                  {img.url ? (
+                    <img
+                      src={img.url}
+                      alt={img.label || img.filename}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Camera className="h-16 w-16 text-gray-600" />
+                  )}
+                  <div className="absolute top-2 left-2 bg-red-600/90 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    LIVE
+                  </div>
                   <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
                     {img.id}
                   </div>
@@ -361,7 +375,7 @@ const Index = () => {
                     </span>
                   </div>
                   <div className="text-sm font-semibold mb-2 text-blue-300">
-                    {img.filename}
+                    {img.label || img.filename}
                   </div>
                   <div className="text-xs text-gray-400">{img.description}</div>
                 </div>
