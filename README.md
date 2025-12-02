@@ -211,18 +211,6 @@ public/imagens/                    📸 5 imagens do cometa
 
 ---
 
-## 📊 Diagrama Visual
-
-Abra o arquivo `AtlasOS_Microkernel.drawio` no [draw.io](https://app.diagrams.net) para visualizar:
-
-- ✅ Todas as 5 camadas do sistema
-- ✅ 28 conexões IPC (Hub-and-Spoke)
-- ✅ Fluxo de interrupção (Câmera → Kernel → IPC → Driver → Flash)
-- ✅ Recovery Agent → Drivers (auto-cura)
-- ✅ Legenda completa de prioridades e comunicação
-
----
-
 ## 🔬 Exemplo: Cenário de Missão
 
 **Um dia típico na exploração do 3I/ATLAS:**
