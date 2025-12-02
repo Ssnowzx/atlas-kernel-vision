@@ -17,14 +17,13 @@
 **Terminal 1 - Simulador Python (opcional):**
 
 ```bash
-cd /Users/snows/TrabalhoOS
 python3 main.py
 ```
 
 **Terminal 2 - Backend Node.js (API + WebSocket):**
 
 ```bash
-cd /Users/snows/atlas-kernel-vision/server
+cd server
 yarn install
 yarn dev
 ```
@@ -32,7 +31,6 @@ yarn dev
 **Terminal 3 - Frontend React (Dashboard):**
 
 ```bash
-cd /Users/snows/atlas-kernel-vision
 yarn install
 yarn dev
 ```
@@ -148,7 +146,7 @@ O AtlasOS implementa uma arquitetura microkernel em **5 camadas**:
 ## 📂 Estrutura de Arquivos
 
 ```
-/Users/snows/TrabalhoOS/          # Backend Microkernel (Python)
+backend/                           # Backend Microkernel (Python)
 ├── main.py                        🚀 Boot modular
 ├── atlasos_sim.py                 🎮 Simulador interativo
 ├── kernel/
@@ -171,14 +169,15 @@ O AtlasOS implementa uma arquitetura microkernel em **5 camadas**:
 ├── FrameWork.md                   📚 Documentação técnica
 └── AtlasOS_Microkernel.drawio     🎨 Diagrama visual
 
-/Users/snows/atlas-kernel-vision/  # Frontend Dashboard (React)
-├── src/
-│   ├── components/Dashboard/      🖥️ Componentes do dashboard
-│   ├── pages/Index.tsx            📄 Página principal
-│   └── store/                     🗃️ Estado global (Zustand)
-├── server/
-│   └── src/index.js               🔌 API + WebSocket
-└── public/imagens/                📸 5 imagens do cometa
+src/                               # Frontend Dashboard (React)
+├── components/Dashboard/          🖥️ Componentes do dashboard
+├── pages/Index.tsx                📄 Página principal
+└── store/                         🗃️ Estado global (Zustand)
+
+server/                            # API + WebSocket
+└── src/index.js                   🔌 Servidor Node.js
+
+public/imagens/                    📸 5 imagens do cometa
 ```
 
 ---
