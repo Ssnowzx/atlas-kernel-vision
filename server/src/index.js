@@ -58,11 +58,11 @@ function sendIPCMessage(source, destination, type) {
 function captureImage() {
   // As 5 imagens reais do cometa 3I/ATLAS
   const cometImages = [
-    { src: "/imagens/Núcleo ativo.png", label: "Núcleo Ativo", description: "Região central do cometa com atividade intensa - H₂O, CH₄ detectado" },
-    { src: "/imagens/Coma expansiva.png", label: "Coma Expansiva", description: "Nuvem de gás e poeira ao redor do núcleo - jatos ativos" },
-    { src: "/imagens/Jato de gás.png", label: "Jato de Gás", description: "Emissão de jatos de gás sublimado - velocidade 800 m/s" },
-    { src: "/imagens/Espectro infravermelho .png", label: "Espectro Infravermelho", description: "Análise térmica do cometa - NH₃ detectado" },
-    { src: "/imagens/Núcleo e coma interstelar.png", label: "Núcleo e Coma Interstelar", description: "Visão completa do objeto interestelar - moléculas orgânicas" },
+    { src: "/imagens/nucleo-ativo.png", label: "Núcleo Ativo", description: "Região central do cometa com atividade intensa - H₂O, CH₄ detectado" },
+    { src: "/imagens/coma-expansiva.png", label: "Coma Expansiva", description: "Nuvem de gás e poeira ao redor do núcleo - jatos ativos" },
+    { src: "/imagens/jato-de-gas.png", label: "Jato de Gás", description: "Emissão de jatos de gás sublimado - velocidade 800 m/s" },
+    { src: "/imagens/espectro-infravermelho.png", label: "Espectro Infravermelho", description: "Análise térmica do cometa - NH₃ detectado" },
+    { src: "/imagens/nucleo-coma-interstelar.png", label: "Núcleo e Coma Interstelar", description: "Visão completa do objeto interestelar - moléculas orgânicas" },
   ];
 
   const imageIndex = systemState.cometImages.length % cometImages.length;

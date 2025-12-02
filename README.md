@@ -367,4 +367,15 @@ Missão: Exploração do Cometa Interestelar 3I/ATLAS ☄️
 
 ---
 
+## 🎬 Demonstração em Vídeo
+
+| Vídeo      | Descrição                       | Download                           |
+| ---------- | ------------------------------- | ---------------------------------- |
+| **Demo 1** | Dashboard AtlasOS em tempo real | [📥 video1.mp4](Slides/video1.mp4) |
+| **Demo 2** | Captura de imagens do cometa    | [📥 video2.mp4](Slides/video2.mp4) |
+
+> 💡 **Dica:** Clique no link para baixar o vídeo ou visualize diretamente no GitHub clonando o repositório.
+
+---
+
 **🌌 "Sem possibilidade de reinício manual a milhões de km da Terra!"**

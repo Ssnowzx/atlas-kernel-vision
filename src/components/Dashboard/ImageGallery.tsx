@@ -28,27 +28,27 @@ import { CapturedImage } from "@/types/dashboard";
 // As 5 imagens reais do cometa 3I/ATLAS (capturadas pela sonda)
 const COMET_IMAGES = [
   {
-    src: "/imagens/Núcleo ativo.png",
+    src: "/imagens/nucleo-ativo.png",
     label: "Núcleo Ativo",
     description: "Região central do cometa com atividade intensa",
   },
   {
-    src: "/imagens/Coma expansiva.png",
+    src: "/imagens/coma-expansiva.png",
     label: "Coma Expansiva",
     description: "Nuvem de gás e poeira ao redor do núcleo",
   },
   {
-    src: "/imagens/Jato de gás.png",
+    src: "/imagens/jato-de-gas.png",
     label: "Jato de Gás",
     description: "Emissão de jatos de gás sublimado",
   },
   {
-    src: "/imagens/Espectro infravermelho .png",
+    src: "/imagens/espectro-infravermelho.png",
     label: "Espectro Infravermelho",
     description: "Análise térmica do cometa",
   },
   {
-    src: "/imagens/Núcleo e coma interstelar.png",
+    src: "/imagens/nucleo-coma-interstelar.png",
     label: "Núcleo e Coma Interstelar",
     description: "Visão completa do objeto interestelar",
   },
