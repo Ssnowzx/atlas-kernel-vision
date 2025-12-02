@@ -350,7 +350,21 @@ Missão: Exploração do Cometa Interestelar 3I/ATLAS ☄️
 
 > **Diagrama completo**: Visualização das 5 camadas do microkernel, fluxo IPC hub-and-spoke, drivers isolados e Recovery Agent.
 
-📄 **Apresentação completa**: [AtlasOS - O Coração da Mineração Espacial (PDF)](Slides/AtlasOS_O_Coração_da_Mineração_Espacial.pdf)
+---
+
+## 📽️ Slides da Apresentação
+
+| Slide       | Visualização                  |
+| ----------- | ----------------------------- |
+| **Slide 1** | ![Slide 1](Slides/slide1.png) |
+| **Slide 2** | ![Slide 2](Slides/slide2.png) |
+| **Slide 3** | ![Slide 3](Slides/slide3.png) |
+| **Slide 4** | ![Slide 4](Slides/slide4.png) |
+| **Slide 5** | ![Slide 5](Slides/slide5.png) |
+| **Slide 6** | ![Slide 6](Slides/slide6.png) |
+| **Slide 7** | ![Slide 7](Slides/slide7.png) |
+| **Slide 8** | ![Slide 8](Slides/slide8.png) |
+| **Slide 9** | ![Slide 9](Slides/slide9.png) |
 
 ---
 
